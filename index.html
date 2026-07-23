@@ -13,6 +13,16 @@
     frame.addEventListener('load', () => {
       const doc = frame.contentDocument;
       const win = frame.contentWindow;
+      const syncParentRoute = () => {
+        if (window.location.hash !== win.location.hash) window.location.hash = win.location.hash;
+      };
+      const syncFrameRoute = () => {
+        if (window.location.hash && win.location.hash !== window.location.hash) win.location.hash = window.location.hash;
+      };
+      win.addEventListener('hashchange', syncParentRoute);
+      window.addEventListener('hashchange', syncFrameRoute);
+      syncFrameRoute();
+      syncParentRoute();
       const maxVisibleAds = 3;
       const maxAdSlots = 10;
       const rows = () => [...doc.querySelectorAll('#suitableChildRows tr')];
