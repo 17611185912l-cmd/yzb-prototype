@@ -14,10 +14,25 @@
       const doc = frame.contentDocument;
       const win = frame.contentWindow;
       const maxVisibleAds = 3;
-      const maxAddedAds = 3;
-      const initialAds = 3;
+      const maxAdSlots = 10;
       const rows = () => [...doc.querySelectorAll('#suitableChildRows tr')];
       const shown = () => rows().filter(row => row.querySelector('select')?.value === '展示').length;
+      const showToast = message => {
+        if (typeof win.showPrototypeToast === 'function') {
+          win.showPrototypeToast(message);
+          return;
+        }
+        let toast = doc.getElementById('prototypeToast');
+        if (!toast) {
+          toast = doc.createElement('div');
+          toast.id = 'prototypeToast';
+          toast.style.cssText = 'position:fixed;z-index:1000;left:50%;bottom:42px;max-width:calc(100vw - 32px);padding:11px 16px;border-radius:8px;background:rgba(23,35,55,.92);box-shadow:0 8px 24px rgba(15,23,42,.2);color:#fff;font-size:14px;line-height:1.45;transform:translateX(-50%);';
+          doc.body.append(toast);
+        }
+        toast.textContent = message;
+        win.clearTimeout(win.prototypeToastTimer);
+        win.prototypeToastTimer = win.setTimeout(() => toast.remove(), 2600);
+      };
       const hint = () => doc.getElementById('suitableChildHint');
       if (!hint()) {
         const message = doc.createElement('div');
@@ -27,13 +42,10 @@
       }
       const sync = (message = '') => {
         const add = doc.getElementById('addSuitableChild');
-        const added = Math.max(0, rows().length - initialAds);
-        if (add) add.disabled = shown() >= maxVisibleAds || added >= maxAddedAds;
-        if (hint()) hint().textContent = message || (added >= maxAddedAds
-          ? `最多可新增 ${maxAddedAds} 个广告位，当前已新增 ${added} 个。`
-          : (shown() >= maxVisibleAds
-            ? `当前已有 ${maxVisibleAds} 个展示中的广告位。请先删除或隐藏一个广告位，才可新增。`
-            : `当前共 ${rows().length} 个广告位，其中 ${shown()} 个展示中；最多新增 ${maxAddedAds} 个，前台最多展示 ${maxVisibleAds} 个。`));
+        if (add) add.disabled = rows().length >= maxAdSlots;
+        if (hint()) hint().textContent = message || (rows().length >= maxAdSlots
+          ? `最多可新增${maxAdSlots}条数据，建议删除后再新增。`
+          : `当前共 ${rows().length} 条广告位，其中 ${shown()} 条展示中；广告位总数最多 ${maxAdSlots} 条，前台最多展示 ${maxVisibleAds} 条。`);
       };
       const openView = () => {
         win.showPage('admin-teachers');
@@ -61,10 +73,10 @@
           openView();
           return;
         }
-        if (event.target.closest('#addSuitableChild') && (shown() >= maxVisibleAds || rows().length - initialAds >= maxAddedAds)) {
+        if (event.target.closest('#addSuitableChild') && rows().length >= maxAdSlots) {
           event.preventDefault();
           event.stopImmediatePropagation();
-          sync(shown() >= maxVisibleAds ? `当前已有 ${maxVisibleAds} 个展示中的广告位。请先删除或隐藏一个广告位，才可新增。` : `最多可新增 ${maxAddedAds} 个广告位。`);
+          sync(`最多可新增${maxAdSlots}条数据，建议删除后再新增。`);
           return;
         }
         const remove = event.target.closest('#suitableChildRows .link-btn.danger');
@@ -79,7 +91,8 @@
         if (!select) return;
         if (select.value === '展示' && shown() > maxVisibleAds) {
           select.value = '隐藏';
-          sync(`前台最多展示 ${maxVisibleAds} 个广告位，请先隐藏其他广告位后再展示。`);
+          sync(`前台最多展示 ${maxVisibleAds} 条广告位，请先隐藏其他广告位后再展示。`);
+          showToast(`前台最多展示 ${maxVisibleAds} 条广告位，请先隐藏其他广告位后再展示。`);
           return;
         }
         sync();
