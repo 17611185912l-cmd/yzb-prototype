@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>个人中心 - 开通后线框原型</title>
+  <style>
+    :root { --ink:#202124; --mid:#697078; --line:#b8bcc1; --soft:#f1f2f3; --paper:#fff; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#e6e8ea; color:var(--ink); font:14px/1.35 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+    button { font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+    .phone { width:min(100%,430px); min-height:100vh; margin:auto; background:#f6f7f8; padding:12px 14px 84px; }
+    .status { height:30px; display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:700; }
+    .signals { font-size:11px; color:var(--mid); }
+    .title-row { display:flex; justify-content:space-between; align-items:center; margin:4px 4px 15px; }
+    h1 { margin:0; font-size:25px; letter-spacing:1px; }
+    .more { width:56px; height:30px; border:1px solid var(--line); border-radius:3px; }
+    .member { background:var(--paper); border:1px solid var(--line); min-height:88px; padding:14px; display:grid; grid-template-columns:58px 1fr auto; gap:12px; align-items:center; }
+    .avatar { width:56px; height:56px; border:1.5px solid var(--ink); border-radius:50%; display:grid; place-items:center; font-size:12px; color:var(--mid); }
+    .name { display:flex; flex-wrap:wrap; align-items:center; gap:5px 7px; font-size:17px; font-weight:700; }
+    .badge { border:1px solid var(--line); border-radius:3px; padding:1px 4px; font-size:11px; color:var(--mid); font-weight:400; }
+    .sub { margin-top:6px; color:var(--mid); font-size:12px; white-space:nowrap; }
+    .section { margin-top:12px; background:var(--paper); border:1px solid var(--line); padding:14px; }
+    .section-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:13px; }
+    h2 { margin:0; font-size:18px; }
+    .role-entries { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .role-entry { min-height:76px; border:1px solid var(--line); display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:14px; font-weight:700; }
+    .role-entry .action-icon { width:34px; height:34px; margin-bottom:7px; }
+    .role-overview { margin:12px 0 0; padding:13px; border:1px solid var(--line); background:var(--paper); }
+    .role-overview h3 { margin:0 0 11px; font-size:15px; }
+    .overview-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:7px; }
+    .overview-stat { position:relative; min-width:0; padding:8px 4px; border:1px solid var(--line); text-align:center; }
+    .overview-stat span { display:block; color:var(--mid); font-size:11px; white-space:nowrap; }
+    .overview-stat strong { display:block; margin-top:4px; font-size:15px; }
+    .stat-entry-arrow { position:absolute; top:4px; right:6px; color:var(--mid); font-size:15px; line-height:1; }
+    .business-hours { margin:12px 0 0; padding:14px; border:1px solid var(--line); background:var(--paper); }
+    .business-hours h3, .business-tools-panel h3 { margin:0 0 6px; font-size:16px; }
+    .business-hours p { margin:0 0 12px; color:var(--mid); font-size:12px; }
+    .business-hours-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+    .business-hours-stats div { padding:9px 5px; border:1px solid var(--line); text-align:center; }
+    .business-hours-stats span { display:block; color:var(--mid); font-size:11px; }
+    .business-hours-stats strong { display:block; margin-top:4px; font-size:16px; }
+    .business-hours .primary-action { width:100%; margin:13px 0 0; }
+    .detail-list.business-list { display:block; margin-top:12px; padding:0; border:0; background:transparent; }
+    .business-tools-panel { padding:14px; border:1px solid var(--line); background:var(--paper); }
+    .business-tools-panel > p { margin:0 0 12px; color:var(--mid); font-size:12px; }
+    .business-tools { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .business-tool { min-height:104px; padding:12px; border:1px solid var(--line); text-align:left; }
+    .business-tool strong { display:block; margin-bottom:6px; font-size:15px; }
+    .business-tool span { display:block; color:var(--mid); font-size:12px; line-height:1.5; }
+    .detail-list.teacher-list { display:block; margin-top:12px; padding:0; border:0; background:transparent; }
+    .teacher-schedule, .teacher-tasks-panel { padding:14px; border:1px solid var(--line); background:var(--paper); }
+    .teacher-schedule { margin-bottom:12px; }
+    .teacher-panel-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .teacher-panel-head h3, .teacher-tasks-panel h3 { margin:0; font-size:16px; }
+    .teacher-panel-head button { height:26px; padding:0 8px; border:1px solid var(--line); border-radius:3px; font-size:12px; }
+    .teacher-schedule-row { display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-top:1px solid #e2e4e6; font-size:13px; }
+    .teacher-schedule-row small { color:var(--mid); text-align:right; }
+    .teacher-tasks { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+    .teacher-task { min-height:88px; padding:11px; border:1px solid var(--line); text-align:left; }
+    .teacher-task strong { display:block; margin-bottom:6px; font-size:15px; }
+    .teacher-task span { display:block; color:var(--mid); font-size:12px; line-height:1.5; }
+    .teacher-quick-title { margin:12px 0 7px; font-size:14px; }
+    .teacher-quick-tasks { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .teacher-quick-tasks .teacher-task { min-height:62px; padding:8px; }
+    .teacher-quick-tasks .teacher-task strong { margin-bottom:3px; font-size:14px; }
+    .detail-list.learning-list { display:block; margin-top:12px; padding:0; border:0; background:transparent; }
+    .learning-quick-tasks { display:grid; grid-template-columns:repeat(2,1fr); gap:7px; }
+    .learning-quick-tasks .teacher-task { min-height:62px; padding:8px 5px; text-align:center; }
+    .learning-quick-tasks .teacher-task strong { margin-bottom:3px; font-size:13px; }
+    .learning-upcoming { padding:14px; border:1px solid var(--line); background:var(--paper); }
+    .learning-upcoming .teacher-schedule-row { padding:10px 0; }
+    .learning-main-calendar { margin-bottom:12px; padding:14px; border:1px solid var(--line); background:var(--paper); }
+    .learning-main-calendar .calendar-day { min-height:48px; }
+    .learning-main-calendar .calendar-day span { padding:2px 1px; border-style:dashed; font-size:9px; }
+    .teacher-calendar { margin-bottom:12px; }
+    .teacher-calendar .calendar-day { min-height:48px; }
+    .teacher-calendar .calendar-day span { font-size:9px; padding:2px 1px; }
+    .teacher-list-toggle { height:26px; padding:0 8px; border:1px solid var(--line); border-radius:3px; font-size:12px; }
+    .link { font-size:12px; color:var(--mid); }
+    .link::after, .row::after { content:"›"; padding-left:5px; font-size:19px; vertical-align:-1px; }
+    .metrics, .actions { display:grid; grid-template-columns:repeat(3,1fr); text-align:center; }
+    .actions { grid-template-columns:repeat(4,1fr); gap:4px; }
+    .metric, .action { min-width:0; }
+    .metric, .action { min-height:46px; }
+    .metric-icon, .action-icon, .quick-icon, .row-icon, .tab-icon { display:block; border:1.5px solid var(--ink); border-radius:50%; margin:0 auto 6px; }
+    .metric-icon { width:42px; height:42px; }
+    .action-icon { width:36px; height:36px; }
+    .notification-badge { position:absolute; top:-7px; right:-8px; min-width:17px; height:17px; padding:0 4px; border-radius:9px; background:#c73535; color:#fff; font-style:normal; font-size:10px; line-height:17px; text-align:center; }
+    .metric strong { display:block; font-size:16px; font-weight:500; }
+    .metric:nth-child(1) strong { text-decoration:underline; }
+    .metric small, .action small { display:block; font-size:12px; color:var(--ink); white-space:nowrap; }
+    .action small { font-size:11px; }
+    .quick { padding:0; display:grid; grid-template-columns:repeat(3,1fr); }
+    .quick button { height:70px; border-right:1px solid var(--line); font-weight:600; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .quick button:last-child { border:0; }
+    .quick-icon { width:22px; height:22px; margin-bottom:5px; }
+    .list { padding:6px 14px; }
+    .row { display:flex; align-items:center; width:100%; height:42px; text-align:left; border-bottom:1px solid #e2e4e6; }
+    .row:last-child { border:0; }
+    .row-icon { width:18px; height:18px; margin:0 10px 0 0; }
+    .row::after { margin-left:auto; color:var(--mid); }
+    .tabbar { position:fixed; z-index:2; left:50%; bottom:0; transform:translateX(-50%); width:min(100%,430px); height:70px; background:var(--paper); border:1px solid var(--line); display:grid; grid-template-columns:repeat(5,1fr); }
+    .tabbar button { font-size:11px; color:var(--mid); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .tab-icon { width:18px; height:18px; margin-bottom:4px; border-color:var(--mid); }
+    .tabbar .active { color:var(--ink); font-weight:700; }
+    .tabbar .active .tab-icon { border-color:var(--ink); }
+    .modal-backdrop { position:fixed; inset:0; background:rgba(32,33,36,.28); display:none; place-items:center; padding:22px; z-index:3; }
+    .modal-backdrop.show { display:grid; }
+    .modal { width:min(100%,340px); border:1.5px solid var(--ink); background:var(--paper); padding:20px; text-align:center; }
+    .modal h3 { margin:0 0 10px; font-size:18px; }
+    .modal p { margin:0 0 18px; color:var(--mid); }
+    .modal button { width:100%; height:38px; border:1px solid var(--ink); font-weight:700; }
+    .role-detail { position:fixed; inset:0; z-index:4; display:none; background:#f6f7f8; max-width:430px; margin:auto; padding:12px 14px 84px; }
+    .role-detail.show { display:block; }
+    .detail-top { height:48px; display:flex; align-items:center; gap:14px; border-bottom:1px solid var(--line); }
+    .back { width:48px; height:30px; border:1px solid var(--line); border-radius:3px; }
+    .detail-top h2 { font-size:20px; }
+    .detail-list { margin-top:12px; background:var(--paper); border:1px solid var(--line); display:grid; grid-template-columns:repeat(3,1fr); gap:16px 4px; padding:18px 10px; }
+    .detail-list .role-entry { border:0; min-height:62px; font-size:12px; font-weight:400; }
+    .function-page { position:fixed; inset:0; z-index:5; display:none; background:#f6f7f8; max-width:430px; margin:auto; padding:12px 14px 84px; overflow:auto; }
+    .function-page.show { display:block; }
+    .function-intro { margin:14px 0 12px; padding:13px; border:1px solid var(--line); background:var(--paper); color:var(--mid); font-size:13px; }
+    .function-card { margin-top:12px; border:1px solid var(--line); background:var(--paper); }
+    .function-card h3 { margin:0; padding:12px 13px; font-size:15px; border-bottom:1px solid var(--line); }
+    .function-row { min-height:48px; padding:10px 13px; border-bottom:1px solid #e2e4e6; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .function-row:last-child { border:0; }
+    .function-row small { color:var(--mid); text-align:right; }
+    .field { margin:12px 13px 0; }
+    .field label { display:block; margin-bottom:6px; font-size:12px; color:var(--mid); }
+    .field-box { height:38px; border:1px solid var(--line); padding:9px 10px; color:#92979c; font-size:13px; }
+    .field-box.large { height:78px; }
+    .primary-action { width:calc(100% - 26px); height:40px; border:1.5px solid var(--ink); margin:16px 13px; font-weight:700; }
+    .membership-option { margin-top:12px; border:1.5px solid var(--ink); background:var(--paper); padding:16px; }
+    .membership-option h3 { margin:0 0 8px; font-size:20px; }
+    .membership-option .price { font-size:26px; font-weight:700; }
+    .membership-option p { margin:10px 0 0; padding-top:10px; border-top:1px solid var(--line); color:var(--mid); font-size:13px; }
+    .course-share { width:64px; height:28px; border:1px solid var(--line); border-radius:3px; font-size:12px; flex:0 0 auto; }
+    .course-filters { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin:14px 0 12px; }
+    .course-filters select { width:100%; height:34px; border:1px solid var(--line); border-radius:3px; background:var(--paper); padding:0 7px; font:13px -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+    .record-filters { display:grid; grid-template-columns:repeat(2,1fr); gap:7px; margin:14px 0 12px; }
+    .record-filters select { width:100%; height:34px; border:1px solid var(--line); border-radius:3px; background:var(--paper); padding:0 7px; font:13px -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+    .course-cards { display:grid; gap:10px; }
+    .course-card { background:var(--paper); border:1px solid var(--line); padding:11px; display:grid; grid-template-columns:82px 1fr; gap:11px; }
+    .course-cover { border:1.5px solid var(--ink); min-height:104px; padding:7px; display:flex; flex-direction:column; justify-content:space-between; font-size:11px; }
+    .course-cover b { font-size:19px; line-height:1.1; }
+    .course-cover span { border-top:1px solid var(--line); padding-top:5px; color:var(--mid); }
+    .course-info { min-width:0; }
+    .course-info h3 { margin:0 0 6px; font-size:15px; line-height:1.35; }
+    .course-meta { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:7px; }
+    .course-meta span { border:1px solid var(--line); padding:2px 5px; font-size:11px; color:var(--mid); }
+    .course-desc { margin:0 0 8px; color:var(--mid); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .course-bottom { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .course-price { font-size:17px; font-weight:700; }
+    .empty-state { border:1px dashed var(--line); padding:24px; text-align:center; color:var(--mid); }
+    .hours-overview { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin:14px 0 12px; }
+    .hours-overview div { min-height:74px; padding:10px 8px; border:1px solid var(--line); background:var(--paper); text-align:center; }
+    .hours-overview span { display:block; color:var(--mid); font-size:11px; }
+    .hours-overview strong { display:block; margin-top:6px; font-size:19px; }
+    .record-card { padding:12px 13px; border-bottom:1px solid #e2e4e6; }
+    .record-card:last-child { border:0; }
+    .record-card h4 { margin:0 0 7px; font-size:14px; }
+    .record-meta { display:grid; grid-template-columns:1fr 1fr; gap:5px 12px; color:var(--mid); font-size:12px; }
+    .schedule-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin:14px 0 12px; }
+    .schedule-stats div { padding:9px 5px; border:1px solid var(--line); background:var(--paper); text-align:center; }
+    .schedule-stats span { display:block; color:var(--mid); font-size:11px; }
+    .schedule-stats strong { display:block; margin-top:4px; font-size:16px; }
+    .calendar-toolbar { display:flex; align-items:center; justify-content:space-between; height:40px; padding:0 10px; border:1px solid var(--line); border-bottom:0; background:var(--paper); }
+    .calendar-toolbar button { width:34px; height:26px; border:1px solid var(--line); border-radius:3px; }
+    .calendar-toolbar strong { font-size:15px; }
+    .calendar-week { border:1px solid var(--line); background:var(--paper); }
+    .calendar-labels, .calendar-days { display:grid; grid-template-columns:repeat(7,1fr); }
+    .calendar-labels { border-bottom:1px solid var(--line); }
+    .calendar-labels span { padding:6px 0; text-align:center; color:var(--mid); font-size:11px; }
+    .calendar-day { min-height:70px; padding:5px 3px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); }
+    .calendar-day:nth-child(7n) { border-right:0; }
+    .calendar-day:nth-last-child(-n+7) { border-bottom:0; }
+    .calendar-day b { display:block; font-size:11px; font-weight:400; color:var(--mid); }
+    .calendar-day span { display:block; padding:3px 2px; border:1px solid var(--line); margin-top:3px; font-size:10px; line-height:1.25; }
+    .calendar-day .free { color:var(--mid); border-style:dashed; text-align:center; margin-top:14px; }
+    .calendar-day.empty { background:#fafafa; }
+    .learning-child { width:100%; height:38px; margin:14px 0 12px; padding:0 10px; border:1px solid var(--line); background:var(--paper); font:13px -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+    .learning-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:12px; }
+    .learning-stats div { padding:9px 5px; border:1px solid var(--line); background:var(--paper); text-align:center; }
+    .learning-stats span { display:block; color:var(--mid); font-size:11px; }
+    .learning-stats strong { display:block; margin-top:4px; font-size:15px; }
+    .learning-calendar .calendar-day { min-height:64px; }
+    .learning-calendar .calendar-day span { border-style:dashed; }
+    .agenda-card { padding:12px 13px; border-bottom:1px solid #e2e4e6; }
+    .agenda-card:last-child { border:0; }
+    .agenda-card h4 { margin:0 0 6px; font-size:14px; }
+    .agenda-card p { margin:3px 0; color:var(--mid); font-size:12px; }
+    .agenda-card .agenda-status { display:inline-block; margin-top:5px; padding:2px 5px; border:1px solid var(--line); font-size:11px; color:var(--mid); }
+    .feedback-stats { display:grid; grid-template-columns:repeat(2,1fr); gap:7px; margin:14px 0 12px; }
+    .feedback-stats div { padding:10px; border:1px solid var(--line); background:var(--paper); }
+    .feedback-stats span { display:block; color:var(--mid); font-size:12px; }
+    .feedback-stats strong { display:block; margin-top:4px; font-size:19px; }
+    .rating-options { display:flex; gap:9px; }
+    .rating-option { width:32px; height:32px; border:1px solid var(--line); border-radius:50%; font-size:13px; }
+    .rating-option.selected { background:var(--soft); border:1.5px solid var(--ink); font-weight:700; }
+    .feedback-form textarea { width:100%; min-height:92px; resize:vertical; border:1px solid var(--line); padding:9px 10px; font:13px/1.4 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+    .feedback-form input, .feedback-form select { width:100%; height:38px; border:1px solid var(--line); padding:0 10px; background:var(--paper); font:13px -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+    .multi-select { position:relative; }
+    .multi-trigger { width:100%; height:38px; border:1px solid var(--line); padding:0 10px; background:var(--paper); text-align:left; font-size:13px; }
+    .multi-trigger::after { content:"⌄"; float:right; font-size:16px; color:var(--mid); }
+    .multi-menu { display:none; position:absolute; z-index:6; top:38px; left:0; right:0; max-height:180px; overflow:auto; border:1px solid var(--line); background:var(--paper); box-shadow:0 4px 10px rgba(0,0,0,.08); }
+    .multi-select.open .multi-menu { display:block; }
+    .multi-menu label { display:flex; align-items:center; gap:7px; min-height:30px; padding:0 10px; font-size:13px; }
+    .multi-menu label + label { border-top:1px solid #e2e4e6; }
+    .multi-menu input { width:15px; height:15px; padding:0; }
+    .child-card { display:grid; grid-template-columns:56px 1fr auto; gap:12px; padding:13px; border-bottom:1px solid #e2e4e6; }
+    .child-card:last-child { border:0; }
+    .child-avatar { width:52px; height:52px; border:1.5px solid var(--ink); border-radius:50%; display:grid; place-items:center; color:var(--mid); font-size:11px; }
+    .child-card h4 { margin:0 0 7px; font-size:15px; }
+    .child-fields { display:grid; grid-template-columns:1fr 1fr; gap:5px 12px; color:var(--mid); font-size:12px; }
+    .child-edit { width:42px; height:25px; border:1px solid var(--line); border-radius:3px; font-size:12px; }
+    .schedule-summary { margin-top:12px; padding:10px 12px; border:1px solid var(--line); background:var(--paper); color:var(--mid); font-size:12px; }
+    .allocation-form { margin-top:14px; padding:2px 0 16px; border:1px solid var(--line); background:var(--paper); }
+    .allocation-form .field select, .allocation-form .field input { width:100%; height:38px; border:1px solid var(--line); padding:0 10px; background:var(--paper); font:13px -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+    .available-tip { margin:8px 13px 0; font-size:12px; color:var(--mid); }
+    .form-error { min-height:18px; margin:8px 13px 0; color:#9b3030; font-size:12px; }
+    @media (min-width:431px) { .phone { box-shadow:0 0 0 1px #c4c7ca,0 8px 30px rgba(0,0,0,.12); } }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <div class="status"><span>23:58</span><span class="signals">状态栏</span></div>
+    <div class="title-row"><h1>个人中心</h1><button class="more" data-name="更多设置">设置</button></div>
+    <section class="member">
+      <div class="avatar">头像</div><div><div class="name">张雪爸爸 <span class="badge">家长</span><span class="badge">老师</span><span class="badge">合伙人</span></div><div class="sub">会员已开通 · 有效期至 2027.05.05</div></div>
+    </section>
+    <section class="section"><div class="section-head"><h2>创客中心</h2><button class="link" data-name="创客中心">查看更多</button></div><div class="metrics"><button class="metric" data-name="一星团队"><span class="metric-icon"></span><strong>20人</strong><small>一星团队</small></button><button class="metric" data-name="二星团队"><span class="metric-icon"></span><strong>10人</strong><small>二星团队</small></button><button class="metric" data-name="累计奖金"><span class="metric-icon"></span><strong>¥123元</strong><small>累计奖金</small></button></div></section>
+    <section class="section"><div class="section-head"><h2>我要合作</h2></div><div class="actions"><button class="action" data-name="申请合伙人"><span class="action-icon"></span><small>申请合伙人</small></button><button class="action" data-name="心理加盟"><span class="action-icon"></span><small>心理加盟</small></button><button class="action" data-name="升学加盟"><span class="action-icon"></span><small>升学加盟</small></button><button class="action" data-name="艺术加盟"><span class="action-icon"></span><small>艺术加盟</small></button></div></section>
+    <section class="section"><div class="section-head"><h2>我要推广</h2></div><div class="actions"><button class="action" data-name="招募合伙人"><span class="action-icon"></span><small>招募合伙人</small></button><button class="action" data-name="邀请机构"><span class="action-icon"></span><small>邀请机构</small></button><button class="action" data-name="邀请家长"><span class="action-icon"></span><small>邀请家长</small></button><button class="action" data-name="邀请老师"><span class="action-icon"></span><small>邀请老师</small></button></div></section>
+    <section class="section role-service">
+      <div class="section-head"><h2>我的服务</h2></div>
+      <div class="role-entries">
+        <button class="role-entry" data-role-detail="partner"><span class="action-icon"></span>业务中心</button>
+        <button class="role-entry" data-role-detail="teacher"><span class="action-icon"></span>教学中心</button>
+        <button class="role-entry" data-role-detail="parent"><span class="action-icon" style="position:relative"><em class="notification-badge">2</em></span>学习中心</button>
+      </div>
+    </section>
+    <section class="section quick"><button data-name="我的订单"><span class="quick-icon"></span>我的订单</button><button data-name="我的课程"><span class="quick-icon"></span>我的课程</button><button data-name="我的收藏"><span class="quick-icon"></span>我的收藏</button></section>
+    <section class="section list"><button class="row" data-name="帮助中心"><span class="row-icon"></span>帮助中心</button><button class="row" data-name="关于我们"><span class="row-icon"></span>关于我们</button></section>
+  </main>
+  <nav class="tabbar"><button data-name="首页"><span class="tab-icon"></span>首页</button><button data-name="全部老师"><span class="tab-icon"></span>全部老师</button><button data-name="成为会员"><span class="tab-icon"></span>成为会员</button><button data-name="消息"><span class="tab-icon"></span>消息</button><button class="active" data-name="我的"><span class="tab-icon"></span>我的</button></nav>
+  <div class="modal-backdrop" id="modal"><div class="modal"><h3 id="modal-title">功能入口</h3><p id="modal-text">已选择此功能。</p><button id="close">关闭</button></div></div>
+  <section class="role-detail" id="role-detail" aria-label="身份功能二级页">
+    <header class="detail-top"><button class="back" id="role-back">返回</button><h2 id="detail-title">身份服务</h2></header>
+    <div id="role-overview"></div>
+    <div class="detail-list" id="detail-list"></div>
+  </section>
+  <section class="function-page" id="function-page" aria-label="功能页面">
+    <header class="detail-top"><button class="back" id="function-back">返回</button><h2 id="function-title">功能页面</h2></header>
+    <div id="function-content"></div>
+  </section>
+  <script>
+    const modal = document.querySelector('#modal');
+    document.querySelectorAll('[data-name]').forEach(item => item.addEventListener('click', () => {
+      const name = item.dataset.name; document.querySelector('#modal-title').textContent = name;
+      document.querySelector('#modal-text').textContent = '线框原型：进入“' + name + '”功能。'; modal.classList.add('show');
+    }));
+    document.querySelector('#close').addEventListener('click', () => modal.classList.remove('show'));
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('show'); });
+    const roleFunctions = {
+      partner: { title: '业务中心', layout:'businessDashboard', items: [
+        { name:'会员销售', layout:'membership', intro:'选择会员推广页并转发给其他用户，由对方自主购买。', plans:[['普通会员','300 元/年'],['卓越会员','500 元/年']] },
+        { name:'课程销售', layout:'courses', intro:'平台全部课程，可筛选后选择单门课程转发。', courses:[
+          {name:'优 AI 语文素养体验课', stage:'小学', subject:'语文', type:'体验课', mode:'1 对 1 直播', price:'39.90', desc:'字词、拼音、古诗文基础能力提升'},
+          {name:'优 AI 数学拓展正式课', stage:'初中', subject:'数学', type:'正式课', mode:'1 对 4 直播', price:'1299.00', desc:'强化逻辑推理与抽象思维能力'},
+          {name:'优 AI 物理拓展体验课', stage:'初中', subject:'物理', type:'体验课', mode:'1 对 1 直播', price:'39.90', desc:'围绕实验与模型开展物理学习'},
+          {name:'优 AI 思政拓展体验课', stage:'初中', subject:'思政', type:'体验课', mode:'1 对 4 直播', price:'39.90', desc:'时政、价值观与理论基础学习'},
+          {name:'优 AI 英语阅读正式课', stage:'小学', subject:'英语', type:'正式课', mode:'1 对 1 直播', price:'899.00', desc:'分级阅读与表达能力训练'},
+          {name:'优 AI 少儿编程启蒙课', stage:'小学', subject:'编程', type:'体验课', mode:'小班直播', price:'49.90', desc:'用项目实践建立编程思维'},
+          {name:'优 AI 科学实验探索课', stage:'小学', subject:'科学', type:'体验课', mode:'小班直播', price:'49.90', desc:'用实验理解身边的科学现象'},
+          {name:'优 AI 美术创想正式课', stage:'小学', subject:'美术', type:'正式课', mode:'小班直播', price:'699.00', desc:'观察、创作与表达能力提升'}
+        ] },
+        { name:'课时分配', layout:'hours', intro:'将已购课时分配给指定用户，便于其使用平台课程。', summary:[['已购课时','1,000'],['已分配','680'],['可分配','320']], users:[['王小明','已分配 200 课时'],['李小雨','已分配 180 课时'],['陈子涵','已分配 300 课时']], action:'分配课时' }
+      ] },
+      teacher: { title: '教学中心', layout:'teacherDashboard', items: [
+        { name:'上课记录', layout:'teachingRecords', intro:'授课记录由系统自动同步，无需手动新增。', total:'236', rows:[
+          {course:'数学思维课', student:'王小明', time:'2026.07.25 10:00', place:'线上直播间', hours:'2 课时'},
+          {course:'英语阅读课', student:'李小雨', time:'2026.07.24 14:00', place:'线上直播间', hours:'1 课时'},
+          {course:'数学思维课', student:'陈子涵', time:'2026.07.23 10:00', place:'优坐标学习中心', hours:'2 课时'},
+          {course:'物理拓展课', student:'赵子轩', time:'2026.07.22 16:00', place:'优坐标学习中心', hours:'2 课时'},
+          {course:'英语阅读课', student:'王小明', time:'2026.07.21 14:00', place:'线上直播间', hours:'1 课时'},
+          {course:'数学思维课', student:'李小雨', time:'2026.07.20 10:00', place:'线上直播间', hours:'2 课时'}
+        ] },
+        { name:'排课动态', layout:'schedule', intro:'按月查看已排课程与空闲日期。', events:[
+          {date:'2026-07-20', time:'10:00', course:'数学思维课', student:'王小明', place:'线上直播间', hours:2},{date:'2026-07-21', time:'14:00', course:'英语阅读课', student:'李小雨', place:'线上直播间', hours:1},{date:'2026-07-22', time:'16:00', course:'物理拓展课', student:'赵子轩', place:'优坐标学习中心', hours:2},{date:'2026-07-23', time:'10:00', course:'数学思维课', student:'陈子涵', place:'优坐标学习中心', hours:2},{date:'2026-07-24', time:'14:00', course:'英语阅读课', student:'王小明', place:'线上直播间', hours:1},{date:'2026-07-25', time:'10:00', course:'数学思维课', student:'李小雨', place:'线上直播间', hours:2}
+        ] },
+        { name:'课后提交', layout:'feedback', intro:'选择已完成课程，提交老师反馈，家长可在课程记录中查看。', stats:[['待提交','2'],['本月已提交','18'],['累计评价','236'],['好评率','98%']], courses:['数学思维课 · 王小明 · 07.25 10:00','英语阅读课 · 李小雨 · 07.24 14:00'], action:'提交课程反馈' },
+        { name:'布置作业', layout:'homework', intro:'选择已完成的课程，为该课程的学生布置课后作业。', courses:[
+          {label:'数学思维课 · 07.25 10:00', students:['王小明','陈子涵','赵子轩']},{label:'英语阅读课 · 07.24 14:00', students:['李小雨','王小明']},{label:'物理拓展课 · 07.22 16:00', students:['赵子轩','陈子涵']}
+        ], action:'发布作业' }
+      ] },
+      parent: { title: '学习中心', layout:'learningDashboard', overview: {title:'学习数据', stats:[{label:'上课记录', value:'32 节', target:'上课记录'}, {label:'剩余课时', value:'30 课时', target:'剩余课时'}]}, items: [
+        { name:'学生档案', layout:'studentProfiles', intro:'可查看和维护多个孩子的基本学习信息。', children:[
+          {name:'王小明', gender:'男', grade:'四年级', school:'南山小学'}, {name:'李小雨', gender:'女', grade:'二年级', school:'实验小学'}
+        ], action:'添加孩子' },
+        { name:'课程计划', badge:2, layout:'learningSchedule', intro:'按孩子查看学习日程与即将开始的课程。', events:[
+          {date:'2026-07-20', time:'10:00', course:'优 AI 数学思维正式课', student:'王小明', place:'线上直播间', hours:2, teacher:'张琴琴老师', status:'已完成'},
+          {date:'2026-07-21', time:'14:00', course:'优 AI 英语阅读体验课', student:'李小雨', place:'线上直播间', hours:1, teacher:'李晨老师', status:'已完成'},
+          {date:'2026-07-24', time:'16:00', course:'优 AI 物理拓展体验课', student:'王小明', place:'优坐标学习中心', hours:2, teacher:'王浩老师', status:'已完成'},
+          {date:'2026-07-26', time:'10:00', course:'优 AI 数学思维正式课', student:'王小明', place:'线上直播间', hours:2, teacher:'张琴琴老师', status:'即将上课'},
+          {date:'2026-07-27', time:'14:00', course:'优 AI 英语阅读体验课', student:'李小雨', place:'线上直播间', hours:1, teacher:'李晨老师', status:'即将上课'}
+        ] },
+        { name:'课签确认', layout:'checkin', intro:'请选择已完成的课程，确认本次上课签到。', courses:[
+          {label:'优 AI 数学思维正式课 · 王小明', time:'2026 年 07 月 25 日 10:00', place:'线上直播间', teacher:'张琴琴老师'},
+          {label:'优 AI 英语阅读体验课 · 李小雨', time:'2026 年 07 月 24 日 14:00', place:'线上直播间', teacher:'李晨老师'}
+        ], action:'确认签到' },
+        { name:'上课记录', hidden:true, layout:'learningRecords', intro:'查看孩子已完成课程的完整记录，可按条件筛选。', rows:[
+          {course:'优 AI 数学思维正式课', student:'王小明', mode:'线上直播', teacher:'张琴琴老师', time:'2026 年 07 月 20 日 10:00', place:'线上直播间', hours:'2 课时'},
+          {course:'优 AI 英语阅读体验课', student:'李小雨', mode:'线上直播', teacher:'李晨老师', time:'2026 年 07 月 21 日 14:00', place:'线上直播间', hours:'1 课时'},
+          {course:'优 AI 物理拓展体验课', student:'王小明', mode:'线下授课', teacher:'王浩老师', time:'2026 年 07 月 24 日 16:00', place:'优坐标学习中心', hours:'2 课时'},
+          {course:'优 AI 数学思维正式课', student:'王小明', mode:'线上直播', teacher:'张琴琴老师', time:'2026 年 07 月 12 日 10:00', place:'线上直播间', hours:'2 课时'},
+          {course:'优 AI 英语阅读体验课', student:'李小雨', mode:'线上直播', teacher:'李晨老师', time:'2026 年 07 月 08 日 14:00', place:'线上直播间', hours:'1 课时'}
+        ] },
+        { name:'剩余课时', hidden:true, layout:'remainingHours', intro:'查看孩子当前可用课时，并可按需续费。', rows:[['优 AI 数学思维正式课','王小明 · 剩余 18 课时'],['优 AI 英语阅读体验课','李小雨 · 剩余 12 课时'],['优 AI 物理拓展体验课','王小明 · 剩余 6 课时']], action:'续费课时' }
+      ] }
+    };
+    const detail = document.querySelector('#role-detail');
+    document.querySelectorAll('[data-role-detail]').forEach(entry => entry.addEventListener('click', () => {
+      const config = roleFunctions[entry.dataset.roleDetail];
+      document.querySelector('#detail-title').textContent = config.title;
+      if (config.layout === 'businessDashboard') renderBusinessDashboard(config);
+      else if (config.layout === 'teacherDashboard') renderTeacherDashboard(config);
+      else if (config.layout === 'learningDashboard') renderLearningDashboard(config);
+      else {
+        document.querySelector('#role-overview').innerHTML = config.overview ? '<section class="role-overview"><h3>' + config.overview.title + '</h3><div class="overview-stats">' + config.overview.stats.map(stat => '<button class="overview-stat" data-function="' + stat.target + '"><span>' + stat.label + '</span><strong>' + stat.value + '</strong></button>').join('') + '</div></section>' : '';
+        document.querySelector('#detail-list').className = 'detail-list';
+        document.querySelector('#detail-list').innerHTML = config.items.filter(item => !item.hidden).map(item => '<button class="role-entry" data-function="' + item.name + '"><span class="action-icon" style="position:relative">' + (item.badge ? '<em class="notification-badge">' + item.badge + '</em>' : '') + '</span>' + item.name + '</button>').join('');
+      }
+      detail.classList.add('show');
+      document.querySelectorAll('#role-detail [data-function]').forEach(item => item.addEventListener('click', () => openFunction(config.items.find(entry => entry.name === item.dataset.function))));
+    }));
+    document.querySelector('#role-back').addEventListener('click', () => detail.classList.remove('show'));
+    function renderBusinessDashboard(config) {
+      const hours = config.items.find(item => item.name === '课时分配');
+      const membership = config.items.find(item => item.name === '会员销售');
+      const courses = config.items.find(item => item.name === '课程销售');
+      document.querySelector('#role-overview').innerHTML = '<section class="business-hours"><h3>课时池</h3><p>将已购课时分配给指定用户</p><div class="business-hours-stats">' + hours.summary.map(item => '<div><span>' + item[0] + '</span><strong>' + item[1] + '</strong></div>').join('') + '</div><button class="primary-action" data-function="课时分配">分配课时</button></section>';
+      document.querySelector('#detail-list').className = 'detail-list business-list';
+      document.querySelector('#detail-list').innerHTML = '<section class="business-tools-panel"><h3>推广工具</h3><p>选择推广内容并分享给其他用户</p><div class="business-tools"><button class="business-tool" data-function="会员销售"><strong>会员销售</strong><span>选择普通或卓越会员推广页并转发</span></button><button class="business-tool" data-function="课程销售"><strong>课程销售</strong><span>浏览平台课程，筛选后转发课程</span></button></div></section>';
+    }
+    function renderTeacherDashboard(config, expanded = false) {
+      const records = config.items.find(item => item.name === '上课记录');
+      const schedule = config.items.find(item => item.name === '排课动态');
+      const feedback = config.items.find(item => item.name === '课后提交');
+      const homework = config.items.find(item => item.name === '布置作业');
+      const scheduleEvents = schedule.events; const shownEvents = expanded ? scheduleEvents : scheduleEvents.slice(0, 3);
+      const calendarMonth = new Date(2026, 6, 1); const startsOn = calendarMonth.getDay(); const daysInMonth = new Date(2026, 7, 0).getDate();
+      let calendarCells = Array.from({length:startsOn}, () => '<div class="calendar-day empty"></div>');
+      for (let day = 1; day <= daysInMonth; day++) { const date = '2026-07-' + String(day).padStart(2, '0'); const dayEvents = scheduleEvents.filter(event => event.date === date); calendarCells.push('<div class="calendar-day"><b>' + day + '</b>' + dayEvents.map(event => '<span>' + event.course.replace('课', '') + '<br>' + event.time + '</span>').join('') + '</div>'); }
+      while (calendarCells.length % 7) calendarCells.push('<div class="calendar-day empty"></div>');
+      document.querySelector('#role-overview').innerHTML = '<section class="role-overview"><h3>教学数据</h3><div class="overview-stats"><button class="overview-stat" data-function="上课记录"><i class="stat-entry-arrow" aria-hidden="true">›</i><span>累计授课</span><strong>' + records.total + ' 课时</strong></button><button class="overview-stat" data-function="排课动态"><i class="stat-entry-arrow" aria-hidden="true">›</i><span>本月排课</span><strong>' + schedule.events.length + ' 节</strong></button></div><h4 class="teacher-quick-title">教学任务</h4><div class="teacher-quick-tasks"><button class="teacher-task" data-function="课后提交"><strong>课后提交</strong><span>待提交 ' + feedback.stats[0][1] + ' 节反馈</span></button><button class="teacher-task" data-function="布置作业"><strong>布置作业</strong><span>按课程发布作业</span></button></div></section>';
+      document.querySelector('#detail-list').className = 'detail-list teacher-list';
+      document.querySelector('#detail-list').innerHTML = '<section class="teacher-schedule teacher-calendar"><div class="teacher-panel-head"><h3>2026 年 7 月排课日历</h3></div><div class="calendar-week"><div class="calendar-labels"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="calendar-days">' + calendarCells.join('') + '</div></div></section><section class="teacher-schedule"><div class="teacher-panel-head"><h3>已排课程</h3><button class="teacher-list-toggle" id="toggle-teacher-schedule">' + (expanded ? '收起' : '展开全部 ' + scheduleEvents.length + ' 条') + '</button></div>' + shownEvents.map(event => '<div class="teacher-schedule-row"><span>' + event.date.slice(5) + ' ' + event.time + ' · ' + event.course + '</span><small>' + event.student + ' · ' + event.place + '</small></div>').join('') + '</section>';
+      document.querySelector('#toggle-teacher-schedule').addEventListener('click', () => renderTeacherDashboard(config, !expanded));
+    }
+    function renderLearningDashboard(config) {
+      const profiles = config.items.find(item => item.name === '学生档案');
+      const schedule = config.items.find(item => item.name === '课程计划');
+      const checkin = config.items.find(item => item.name === '课签确认');
+      const upcoming = schedule.events.filter(event => event.status === '即将上课');
+      const calendarMonth = new Date(2026, 6, 1); const startsOn = calendarMonth.getDay(); const daysInMonth = new Date(2026, 7, 0).getDate();
+      let calendarCells = Array.from({length:startsOn}, () => '<div class="calendar-day empty"></div>');
+      for (let day = 1; day <= daysInMonth; day++) { const date = '2026-07-' + String(day).padStart(2, '0'); const dayEvents = schedule.events.filter(event => event.date === date); calendarCells.push('<div class="calendar-day"><b>' + day + '</b>' + dayEvents.map(event => '<span>' + event.student + ' · ' + event.course.replace('优 AI ', '').replace('课', '') + '<br>' + event.time + '</span>').join('') + '</div>'); }
+      while (calendarCells.length % 7) calendarCells.push('<div class="calendar-day empty"></div>');
+      document.querySelector('#role-overview').innerHTML = '<section class="role-overview"><h3>学习数据</h3><div class="overview-stats">' + config.overview.stats.map(stat => '<button class="overview-stat" data-function="' + stat.target + '"><i class="stat-entry-arrow" aria-hidden="true">›</i><span>' + stat.label + '</span><strong>' + stat.value + '</strong></button>').join('') + '</div></section>';
+      document.querySelector('#detail-list').className = 'detail-list learning-list';
+      document.querySelector('#detail-list').innerHTML = '<section class="learning-main-calendar"><div class="teacher-panel-head"><h3>2026 年 7 月课程计划</h3></div><div class="calendar-week"><div class="calendar-labels"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="calendar-days">' + calendarCells.join('') + '</div></div></section><section class="learning-upcoming"><div class="teacher-panel-head"><h3>即将上课</h3></div>' + upcoming.map(event => '<div class="teacher-schedule-row"><span>' + event.date.slice(5) + ' ' + event.time + ' · ' + event.course + '</span><small>' + event.student + ' · ' + event.teacher + '</small></div>').join('') + '</section><section class="learning-upcoming"><h3 class="teacher-quick-title">学习服务</h3><div class="learning-quick-tasks"><button class="teacher-task" data-function="学生档案"><strong>学生档案</strong><span>管理孩子信息</span></button><button class="teacher-task" data-function="课签确认"><strong>课签确认</strong><span>确认上课签到</span></button></div></section>';
+    }
+    const functionPage = document.querySelector('#function-page');
+    function openFunction(config) {
+      document.querySelector('#function-title').textContent = config.name;
+      functionPage.classList.add('show');
+      if (config.layout === 'courses') { renderCourseList(config); return; }
+      if (config.layout === 'schedule') { renderSchedule(config); return; }
+      if (config.layout === 'learningSchedule') { renderLearningSchedule(config); return; }
+      if (config.layout === 'feedback') { renderFeedback(config); return; }
+      if (config.layout === 'homework') { renderHomework(config); return; }
+      if (config.layout === 'studentProfiles') { renderStudentProfiles(config); return; }
+      if (config.layout === 'checkin') { renderCheckin(config); return; }
+      if (config.layout === 'learningRecords') { renderLearningRecords(config); return; }
+      if (config.layout === 'remainingHours') { renderRemainingHours(config); return; }
+      let content = '<p class="function-intro">' + config.intro + '</p>';
+      if (config.layout === 'membership') {
+        content += config.plans.map(plan => '<section class="membership-option"><h3>' + plan[0] + '</h3><div class="price">' + plan[1] + '</div><p>可享受会员价购买精品 AI 课程<br>20 小时 / 单科</p><button class="primary-action" data-plan="' + plan[0] + '">转发' + plan[0] + '推广页</button></section>').join('');
+      } else if (config.layout === 'hours') {
+        content += '<div class="hours-overview">' + config.summary.map(item => '<div><span>' + item[0] + '</span><strong>' + item[1] + '</strong></div>').join('') + '</div><section class="function-card"><h3>已分配用户</h3>' + config.users.map(user => '<div class="function-row"><span>' + user[0] + '</span><small>' + user[1] + '</small></div>').join('') + '</section><section class="function-card"><button class="primary-action" data-allocate>' + config.action + '</button></section>';
+      } else if (config.layout === 'teachingRecords') {
+        content += '<section class="function-card"><div class="function-row"><span>累计授课课时</span><strong>' + config.total + ' 课时</strong></div></section><section class="function-card"><h3>全部记录</h3>' + config.rows.map(row => '<article class="record-card"><h4>' + row.course + '</h4><div class="record-meta"><span>学生：' + row.student + '</span><span>课时：' + row.hours + '</span><span>时间：' + row.time + '</span><span>地点：' + row.place + '</span></div></article>').join('') + '</section>';
+      } else {
+        content += '<section class="function-card"><h3>' + config.group + '</h3>' + config.rows.map(row => '<div class="function-row"><span>' + row[0] + '</span><small>' + row[1] + '</small></div>').join('') + '</section><section class="function-card"><div class="field"><label>备注</label><div class="field-box large">请输入相关说明</div></div><button class="primary-action" data-submit="' + config.name + '">' + config.action + '</button></section>';
+      }
+      document.querySelector('#function-content').innerHTML = content;
+      const action = document.querySelector('[data-submit]');
+      if (action) action.addEventListener('click', () => { document.querySelector('#modal-title').textContent = config.action; document.querySelector('#modal-text').textContent = '线框原型：已打开转发操作。'; modal.classList.add('show'); });
+      const allocate = document.querySelector('[data-allocate]');
+      if (allocate) allocate.addEventListener('click', () => renderAllocation(config));
+      document.querySelectorAll('[data-plan]').forEach(item => item.addEventListener('click', () => { document.querySelector('#modal-title').textContent = '转发会员推广页'; document.querySelector('#modal-text').textContent = '线框原型：已选择转发“' + item.dataset.plan + '”推广页。'; modal.classList.add('show'); }));
+      document.querySelectorAll('[data-course]').forEach(item => item.addEventListener('click', () => { document.querySelector('#modal-title').textContent = '转发课程'; document.querySelector('#modal-text').textContent = '线框原型：已选择转发“' + item.dataset.course + '”。'; modal.classList.add('show'); }));
+    }
+    function renderAllocation(config) {
+      document.querySelector('#function-title').textContent = '分配课时';
+      const available = Number(config.summary[2][1].replace(',', ''));
+      const userOptions = config.users.map(user => '<option value="' + user[0] + '">' + user[0] + '</option>').join('') + '<option value="新用户">新用户</option>';
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">选择接收课时的用户，填写课时数后确认分配。</p><section class="allocation-form"><div class="field"><label>选择用户</label><select id="allocation-user"><option value="">请选择用户</option>' + userOptions + '</select></div><div class="field"><label>分配课时</label><input id="allocation-hours" type="number" min="1" max="' + available + '" inputmode="numeric" placeholder="请输入课时数"></div><p class="available-tip">当前可分配：' + available + ' 课时</p><p class="form-error" id="allocation-error"></p><button class="primary-action" id="confirm-allocation">确认分配</button></section>';
+      document.querySelector('#confirm-allocation').addEventListener('click', () => {
+        const user = document.querySelector('#allocation-user').value;
+        const hours = Number(document.querySelector('#allocation-hours').value);
+        const error = document.querySelector('#allocation-error');
+        if (!user) { error.textContent = '请选择用户'; return; }
+        if (!Number.isInteger(hours) || hours <= 0) { error.textContent = '请输入大于 0 的整数课时'; return; }
+        if (hours > available) { error.textContent = '分配课时不能超过当前可分配余额'; return; }
+        const existing = config.users.find(item => item[0] === user);
+        if (existing) { const assigned = Number(existing[1].match(/\d+/)[0]); existing[1] = '已分配 ' + (assigned + hours) + ' 课时'; }
+        else config.users.push([user, '已分配 ' + hours + ' 课时']);
+        config.summary[1][1] = (Number(config.summary[1][1].replace(',', '')) + hours).toLocaleString('en-US');
+        config.summary[2][1] = (available - hours).toLocaleString('en-US');
+        openFunction(config);
+        document.querySelector('#modal-title').textContent = '分配成功';
+        document.querySelector('#modal-text').textContent = '已向“' + user + '”分配 ' + hours + ' 课时。'; modal.classList.add('show');
+      });
+    }
+    function renderCourseList(config) {
+      const stage = document.querySelector('[data-course-filter="stage"]')?.value || '全部学段';
+      const subject = document.querySelector('[data-course-filter="subject"]')?.value || '全部学科';
+      const type = document.querySelector('[data-course-filter="type"]')?.value || '全部类型';
+      const courses = config.courses.filter(course => (stage === '全部学段' || course.stage === stage) && (subject === '全部学科' || course.subject === subject) && (type === '全部类型' || course.type === type));
+      const options = (values, all) => '<option>' + all + '</option>' + [...new Set(values)].map(value => '<option' + (value === (all === '全部学段' ? stage : all === '全部学科' ? subject : type) ? ' selected' : '') + '>' + value + '</option>').join('');
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">' + config.intro + '</p><div class="course-filters"><select data-course-filter="stage">' + options(config.courses.map(c => c.stage), '全部学段') + '</select><select data-course-filter="subject">' + options(config.courses.map(c => c.subject), '全部学科') + '</select><select data-course-filter="type">' + options(config.courses.map(c => c.type), '全部类型') + '</select></div><div class="course-cards">' + (courses.length ? courses.map(course => '<article class="course-card"><div class="course-cover"><span>' + course.type + '</span><b>' + course.subject + '<br>课程</b><span>' + course.stage + '</span></div><div class="course-info"><h3>' + course.name + '</h3><div class="course-meta"><span>' + course.stage + '</span><span>' + course.mode + '</span></div><p class="course-desc">' + course.desc + '</p><div class="course-bottom"><span class="course-price">¥ ' + course.price + '</span><button class="course-share" data-course="' + course.name + '">转发</button></div></div></article>').join('') : '<div class="empty-state">暂无符合条件的课程</div>') + '</div>';
+      document.querySelectorAll('[data-course-filter]').forEach(filter => filter.addEventListener('change', () => renderCourseList(config)));
+      document.querySelectorAll('[data-course]').forEach(item => item.addEventListener('click', () => { document.querySelector('#modal-title').textContent = '转发课程'; document.querySelector('#modal-text').textContent = '线框原型：已选择转发“' + item.dataset.course + '”。'; modal.classList.add('show'); }));
+    }
+    function renderSchedule(config, offset = 0) {
+      const viewed = new Date(2026, 6 + offset, 1);
+      const year = viewed.getFullYear(); const month = viewed.getMonth();
+      const monthKey = year + '-' + String(month + 1).padStart(2, '0');
+      const events = config.events.filter(event => event.date.startsWith(monthKey));
+      const daysInMonth = new Date(year, month + 1, 0).getDate(); const startsOn = viewed.getDay();
+      const scheduledDays = new Set(events.map(event => event.date)).size;
+      const totalHours = events.reduce((sum, event) => sum + event.hours, 0);
+      let cells = Array.from({length:startsOn}, () => '<div class="calendar-day empty"></div>');
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = monthKey + '-' + String(day).padStart(2, '0'); const dayEvents = events.filter(event => event.date === date);
+        cells.push('<div class="calendar-day"><b>' + day + '</b>' + (dayEvents.length ? dayEvents.map(event => '<span>' + event.course.replace('课', '') + '<br>' + event.time + '</span>').join('') : '<span class="free">空闲</span>') + '</div>');
+      }
+      while (cells.length % 7) cells.push('<div class="calendar-day empty"></div>');
+      const list = events.length ? events.map(event => '<div class="function-row"><span>' + event.date.slice(5) + ' ' + event.time + '</span><small>' + event.course + ' · ' + event.student + ' · ' + event.place + (event.teacher ? ' · ' + event.teacher : '') + '</small></div>').join('') : '<div class="empty-state">本月暂无已排课程</div>';
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">' + config.intro + '</p><div class="schedule-stats"><div><span>已排课程</span><strong>' + events.length + ' 节</strong></div><div><span>已排课时</span><strong>' + totalHours + ' 课时</strong></div><div><span>空闲日期</span><strong>' + (daysInMonth - scheduledDays) + ' 天</strong></div></div><div class="calendar-toolbar"><button data-month="-1">‹</button><strong>' + year + ' 年 ' + (month + 1) + ' 月</strong><button data-month="1">›</button></div><section class="calendar-week"><div class="calendar-labels"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="calendar-days">' + cells.join('') + '</div></section><section class="function-card"><h3>本月已排课程</h3>' + list + '</section>';
+      document.querySelectorAll('[data-month]').forEach(button => button.addEventListener('click', () => renderSchedule(config, offset + Number(button.dataset.month))));
+    }
+    function renderLearningSchedule(config, offset = 0, selectedChild = '全部孩子') {
+      const children = [...new Set(config.events.map(event => event.student))];
+      const viewed = new Date(2026, 6 + offset, 1); const year = viewed.getFullYear(); const month = viewed.getMonth();
+      const monthKey = year + '-' + String(month + 1).padStart(2, '0');
+      const events = config.events.filter(event => event.date.startsWith(monthKey) && (selectedChild === '全部孩子' || event.student === selectedChild));
+      const daysInMonth = new Date(year, month + 1, 0).getDate(); const startsOn = viewed.getDay();
+      const hours = events.reduce((sum, event) => sum + event.hours, 0); const upcoming = events.filter(event => event.status === '即将上课');
+      let cells = Array.from({length:startsOn}, () => '<div class="calendar-day empty"></div>');
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = monthKey + '-' + String(day).padStart(2, '0'); const dayEvents = events.filter(event => event.date === date);
+        cells.push('<div class="calendar-day"><b>' + day + '</b>' + dayEvents.map(event => '<span>' + event.student + ' · ' + event.course.replace('优 AI ', '').replace('课', '') + '<br>' + event.time + '</span>').join('') + '</div>');
+      }
+      while (cells.length % 7) cells.push('<div class="calendar-day empty"></div>');
+      const upcomingText = upcoming.length ? upcoming[0].date.slice(5) + ' ' + upcoming[0].time : '暂无';
+      const orderedEvents = [...events].sort((a, b) => (a.status === '即将上课' ? 0 : 1) - (b.status === '即将上课' ? 0 : 1) || a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+      const agenda = orderedEvents.length ? orderedEvents.map(event => '<article class="agenda-card"><h4>' + event.course + '</h4><p>' + event.date.slice(0, 4) + ' 年 ' + event.date.slice(5, 7) + ' 月 ' + event.date.slice(8, 10) + ' 日 ' + event.time + ' · ' + event.student + '</p><p>' + event.place + ' · ' + event.teacher + ' · ' + event.hours + ' 课时</p><span class="agenda-status">' + event.status + '</span></article>').join('') : '<div class="empty-state">本月暂无学习安排</div>';
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">' + config.intro + '</p><select class="learning-child" id="learning-child"><option' + (selectedChild === '全部孩子' ? ' selected' : '') + '>全部孩子</option>' + children.map(child => '<option' + (selectedChild === child ? ' selected' : '') + '>' + child + '</option>').join('') + '</select><div class="learning-stats"><div><span>本月课程</span><strong>' + events.length + ' 节</strong></div><div><span>学习课时</span><strong>' + hours + ' 课时</strong></div><div><span>下次上课</span><strong>' + upcomingText + '</strong></div></div><div class="calendar-toolbar"><button data-learning-month="-1">‹</button><strong>' + year + ' 年 ' + (month + 1) + ' 月</strong><button data-learning-month="1">›</button></div><section class="calendar-week learning-calendar"><div class="calendar-labels"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="calendar-days">' + cells.join('') + '</div></section><section class="function-card"><h3>本月学习安排</h3>' + agenda + '</section>';
+      document.querySelector('#learning-child').addEventListener('change', event => renderLearningSchedule(config, offset, event.target.value));
+      document.querySelectorAll('[data-learning-month]').forEach(button => button.addEventListener('click', () => renderLearningSchedule(config, offset + Number(button.dataset.learningMonth), selectedChild)));
+    }
+    function renderFeedback(config) {
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">' + config.intro + '</p><div class="feedback-stats">' + config.stats.map(stat => '<div><span>' + stat[0] + '</span><strong>' + stat[1] + '</strong></div>').join('') + '</div><section class="function-card feedback-form"><h3>课程反馈</h3><div class="field"><label>选择课程</label><select id="feedback-course"><option value="">请选择已上课程</option>' + config.courses.map(course => '<option>' + course + '</option>').join('') + '</select></div><div class="field"><label>本次评分</label><div class="rating-options">' + [1,2,3,4,5].map(score => '<button class="rating-option" data-rating="' + score + '">' + score + '</button>').join('') + '</div></div><div class="field"><label>课程评价</label><textarea id="feedback-text" placeholder="请输入本节课的学习表现、重点内容和后续建议"></textarea></div><p class="form-error" id="feedback-error"></p><button class="primary-action" id="submit-feedback">' + config.action + '</button></section>';
+      let rating = 0;
+      document.querySelectorAll('[data-rating]').forEach(button => button.addEventListener('click', () => { rating = Number(button.dataset.rating); document.querySelectorAll('[data-rating]').forEach(item => item.classList.toggle('selected', Number(item.dataset.rating) <= rating)); }));
+      document.querySelector('#submit-feedback').addEventListener('click', () => {
+        const course = document.querySelector('#feedback-course').value; const text = document.querySelector('#feedback-text').value.trim(); const error = document.querySelector('#feedback-error');
+        if (!course) { error.textContent = '请选择课程'; return; }
+        if (!rating) { error.textContent = '请选择本次评分'; return; }
+        if (!text) { error.textContent = '请填写课程评价'; return; }
+        document.querySelector('#modal-title').textContent = '提交成功'; document.querySelector('#modal-text').textContent = '“' + course + '”的课程反馈已提交。'; modal.classList.add('show');
+      });
+    }
+    function renderHomework(config) {
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">' + config.intro + '</p><section class="function-card feedback-form"><h3>作业内容</h3><div class="field"><label>选择课程</label><div class="multi-select" id="course-select"><button class="multi-trigger" type="button" id="course-trigger"></button><div class="multi-menu" id="course-menu"></div></div></div><div class="field"><label>布置给学生</label><div class="multi-select" id="student-select"><button class="multi-trigger" type="button" id="student-trigger"></button><div class="multi-menu" id="student-menu"></div></div></div><div class="field"><label>作业标题</label><input id="homework-title" type="text" placeholder="请输入作业标题"></div><div class="field"><label>作业要求</label><textarea id="homework-content" placeholder="请输入作业内容和完成要求"></textarea></div><div class="field"><label>截止时间</label><input id="homework-date" type="date"></div><p class="form-error" id="homework-error"></p><button class="primary-action" id="submit-homework">' + config.action + '</button></section>';
+      let selectedCourses = []; let selectedStudents = [];
+      function toggleMenu(id) { document.querySelectorAll('.multi-select').forEach(menu => { if (menu.id !== id) menu.classList.remove('open'); }); document.querySelector('#' + id).classList.toggle('open'); }
+      function updateStudents(reset = false) {
+        const available = [...new Set(selectedCourses.flatMap(index => config.courses[index].students))];
+        if (reset) selectedStudents = available; else selectedStudents = selectedStudents.filter(student => available.includes(student));
+        if (!available.length) { document.querySelector('#student-trigger').textContent = '请先选择课程'; document.querySelector('#student-menu').innerHTML = '<p class="empty-state">请先选择课程</p>'; return; }
+        document.querySelector('#student-trigger').textContent = selectedStudents.length === available.length ? '全部学生（' + available.length + '）' : '已选 ' + selectedStudents.length + ' 名学生';
+        document.querySelector('#student-menu').innerHTML = '<label><input id="all-students" type="checkbox" ' + (selectedStudents.length === available.length ? 'checked' : '') + '>全部学生</label>' + available.map(student => '<label><input class="student-checkbox" type="checkbox" value="' + student + '" ' + (selectedStudents.includes(student) ? 'checked' : '') + '>' + student + '</label>').join('');
+        document.querySelector('#all-students').addEventListener('change', event => { selectedStudents = event.target.checked ? available : []; updateStudents(); });
+        document.querySelectorAll('.student-checkbox').forEach(box => box.addEventListener('change', () => { selectedStudents = [...document.querySelectorAll('.student-checkbox:checked')].map(item => item.value); updateStudents(); }));
+      }
+      function updateCourses() {
+        document.querySelector('#course-trigger').textContent = selectedCourses.length === config.courses.length ? '全部课程（' + config.courses.length + '）' : selectedCourses.length ? '已选 ' + selectedCourses.length + ' 门课程' : '请选择课程';
+        document.querySelector('#course-menu').innerHTML = '<label><input id="all-courses" type="checkbox" ' + (selectedCourses.length === config.courses.length ? 'checked' : '') + '>全部课程</label>' + config.courses.map((course, index) => '<label><input class="course-checkbox" type="checkbox" value="' + index + '" ' + (selectedCourses.includes(index) ? 'checked' : '') + '>' + course.label + '</label>').join('');
+        document.querySelector('#all-courses').addEventListener('change', event => { selectedCourses = event.target.checked ? config.courses.map((_, index) => index) : []; updateCourses(); updateStudents(true); });
+        document.querySelectorAll('.course-checkbox').forEach(box => box.addEventListener('change', () => { selectedCourses = [...document.querySelectorAll('.course-checkbox:checked')].map(item => Number(item.value)); updateCourses(); updateStudents(true); }));
+      }
+      document.querySelector('#course-trigger').addEventListener('click', () => toggleMenu('course-select'));
+      document.querySelector('#student-trigger').addEventListener('click', () => toggleMenu('student-select'));
+      updateCourses(); updateStudents(true);
+      document.querySelector('#submit-homework').addEventListener('click', () => {
+        const students = selectedStudents; const title = document.querySelector('#homework-title').value.trim(); const content = document.querySelector('#homework-content').value.trim(); const date = document.querySelector('#homework-date').value; const error = document.querySelector('#homework-error');
+        if (!selectedCourses.length) { error.textContent = '请至少选择一门课程'; return; }
+        if (!students.length) { error.textContent = '请至少选择一名学生'; return; }
+        if (!title) { error.textContent = '请输入作业标题'; return; }
+        if (!content) { error.textContent = '请输入作业要求'; return; }
+        if (!date) { error.textContent = '请选择截止时间'; return; }
+        document.querySelector('#modal-title').textContent = '发布成功'; document.querySelector('#modal-text').textContent = '已向 ' + students.length + ' 名学生发布作业。'; modal.classList.add('show');
+      });
+    }
+    function renderStudentProfiles(config) {
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">' + config.intro + '</p><section class="function-card"><h3>我的孩子</h3>' + config.children.map((child, index) => '<article class="child-card"><div class="child-avatar">头像</div><div><h4>' + child.name + '</h4><div class="child-fields"><span>性别：' + child.gender + '</span><span>年级：' + child.grade + '</span><span>学校：' + child.school + '</span></div></div><button class="child-edit" data-edit-child="' + index + '">修改</button></article>').join('') + '</section><section class="function-card"><button class="primary-action" id="add-child">' + config.action + '</button></section>';
+      document.querySelector('#add-child').addEventListener('click', () => renderChildForm(config));
+      document.querySelectorAll('[data-edit-child]').forEach(button => button.addEventListener('click', () => renderChildForm(config, Number(button.dataset.editChild))));
+    }
+    function renderCheckin(config) {
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">' + config.intro + '</p><section class="function-card feedback-form"><h3>课程签到</h3><div class="field"><label>选择课程</label><select id="checkin-course"><option value="">请选择待确认课程</option>' + config.courses.map((course, index) => '<option value="' + index + '">' + course.label + '</option>').join('') + '</select></div><div class="field"><label>课程信息</label><div class="field-box large" id="checkin-info">选择课程后查看上课时间、地点和老师</div></div><p class="form-error" id="checkin-error"></p><button class="primary-action" id="confirm-checkin">' + config.action + '</button></section>';
+      document.querySelector('#checkin-course').addEventListener('change', event => { const course = config.courses[Number(event.target.value)]; document.querySelector('#checkin-info').textContent = course ? course.time + '；' + course.place + '；' + course.teacher : '选择课程后查看上课时间、地点和老师'; });
+      document.querySelector('#confirm-checkin').addEventListener('click', () => {
+        const value = document.querySelector('#checkin-course').value; const error = document.querySelector('#checkin-error');
+        if (value === '') { error.textContent = '请选择待确认课程'; return; }
+        document.querySelector('#modal-title').textContent = '签到成功'; document.querySelector('#modal-text').textContent = '已确认“' + config.courses[Number(value)].label + '”的上课签到。'; modal.classList.add('show');
+      });
+    }
+    function renderLearningRecords(config, filters = {}) {
+      const fields = [['course','课程'],['student','孩子'],['mode','授课方式'],['teacher','老师']];
+      const records = config.rows.filter(record => fields.every(([key]) => !filters[key] || record[key] === filters[key]));
+      const options = (key, label) => '<option value="">全部' + label + '</option>' + [...new Set(config.rows.map(record => record[key]))].map(value => '<option' + (filters[key] === value ? ' selected' : '') + '>' + value + '</option>').join('');
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">' + config.intro + '</p><div class="record-filters">' + fields.map(([key, label]) => '<select data-record-filter="' + key + '">' + options(key, label) + '</select>').join('') + '</div><section class="function-card"><h3>课程记录</h3>' + (records.length ? records.map(record => '<article class="record-card"><h4>' + record.course + '</h4><div class="record-meta"><span>孩子：' + record.student + '</span><span>老师：' + record.teacher + '</span><span>方式：' + record.mode + '</span><span>课时：' + record.hours + '</span><span>时间：' + record.time + '</span><span>地点：' + record.place + '</span></div></article>').join('') : '<div class="empty-state">暂无符合条件的课程记录</div>') + '</section>';
+      document.querySelectorAll('[data-record-filter]').forEach(filter => filter.addEventListener('change', () => { const next = {}; document.querySelectorAll('[data-record-filter]').forEach(item => { next[item.dataset.recordFilter] = item.value; }); renderLearningRecords(config, next); }));
+    }
+    function renderRemainingHours(config) {
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">' + config.intro + '</p><section class="function-card"><h3>课时概览</h3>' + config.rows.map(row => '<div class="function-row"><span>' + row[0] + '</span><strong>' + row[1] + '</strong></div>').join('') + '</section><section class="function-card"><button class="primary-action" id="renew-hours">' + config.action + '</button></section>';
+      document.querySelector('#renew-hours').addEventListener('click', () => { document.querySelector('#modal-title').textContent = '续费课时'; document.querySelector('#modal-text').textContent = '线框原型：已进入课时续费流程。'; modal.classList.add('show'); });
+    }
+    function renderChildForm(config, editIndex = null) {
+      const child = editIndex === null ? {} : config.children[editIndex]; const isEditing = editIndex !== null;
+      document.querySelector('#function-title').textContent = isEditing ? '修改孩子信息' : '添加孩子';
+      document.querySelector('#function-content').innerHTML = '<p class="function-intro">请填写孩子的基本学习信息，保存后可继续添加其他孩子。</p><section class="function-card feedback-form"><h3>基本信息</h3><div class="field"><label>孩子头像</label><div class="child-avatar">头像</div></div><div class="field"><label>孩子姓名</label><input id="child-name" type="text" value="' + (child.name || '') + '" placeholder="请输入孩子姓名"></div><div class="field"><label>性别</label><select id="child-gender"><option value="">请选择性别</option><option' + (child.gender === '男' ? ' selected' : '') + '>男</option><option' + (child.gender === '女' ? ' selected' : '') + '>女</option></select></div><div class="field"><label>年级</label><select id="child-grade"><option value="">请选择年级</option>' + ['一年级','二年级','三年级','四年级','五年级','六年级','初一','初二','初三'].map(grade => '<option' + (child.grade === grade ? ' selected' : '') + '>' + grade + '</option>').join('') + '</select></div><div class="field"><label>就读学校</label><input id="child-school" type="text" value="' + (child.school || '') + '" placeholder="请输入就读学校"></div><p class="form-error" id="child-error"></p><button class="primary-action" id="save-child">' + (isEditing ? '保存修改' : '保存孩子信息') + '</button></section>';
+      document.querySelector('#save-child').addEventListener('click', () => {
+        const name = document.querySelector('#child-name').value.trim(); const gender = document.querySelector('#child-gender').value; const grade = document.querySelector('#child-grade').value; const school = document.querySelector('#child-school').value.trim(); const error = document.querySelector('#child-error');
+        if (!name || !gender || !grade || !school) { error.textContent = '请完整填写孩子信息'; return; }
+        if (isEditing) config.children[editIndex] = {name, gender, grade, school}; else config.children.push({name, gender, grade, school}); openFunction(config);
+        document.querySelector('#modal-title').textContent = isEditing ? '修改成功' : '添加成功'; document.querySelector('#modal-text').textContent = '已保存“' + name + '”的学生档案。'; modal.classList.add('show');
+      });
+    }
+    document.querySelector('#function-back').addEventListener('click', () => functionPage.classList.remove('show'));
+    // Notify the standalone UX notes preview without changing the prototype flow.
+    function reportPreviewPage(page) {
+      if (window.parent !== window) window.parent.postMessage({ channel: 'personal-center-prototype', page }, '*');
+    }
+    function currentRoleKey() {
+      return ({ '业务中心':'partner', '教学中心':'teacher', '学习中心':'parent' })[document.querySelector('#detail-title').textContent] || '';
+    }
+    document.addEventListener('click', event => {
+      const target = event.target instanceof Element ? event.target : event.target.parentElement;
+      if (!target) return;
+      const roleEntry = target.closest('[data-role-detail]');
+      if (roleEntry) { reportPreviewPage(roleEntry.dataset.roleDetail); return; }
+      const functionEntry = target.closest('[data-function]');
+      if (functionEntry) { reportPreviewPage(currentRoleKey() + '-' + functionEntry.dataset.function); return; }
+      if (target.closest('.teacher-calendar')) { reportPreviewPage('teacher-排课动态'); return; }
+      if (target.closest('.learning-main-calendar') || target.closest('.learning-upcoming')) { reportPreviewPage('parent-课程计划'); return; }
+      if (target.closest('#role-back')) { reportPreviewPage('profile'); return; }
+      if (target.closest('#function-back')) { reportPreviewPage(currentRoleKey()); return; }
+      if (target.closest('#add-child') || target.closest('[data-edit-child]')) reportPreviewPage('parent-学生档案');
+    }, true);
+  </script>
+</body>
+</html>

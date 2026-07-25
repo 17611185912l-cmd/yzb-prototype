@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>个人中心原型说明预览</title>
+  <style>
+    :root { --ink:#202124; --muted:#697078; --line:#c7ccd1; --surface:#fff; --bg:#eef0f2; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+    button { font:inherit; color:inherit; cursor:pointer; }
+    .layout { max-width:1320px; margin:0 auto; min-height:100vh; padding:30px 32px; display:grid; grid-template-columns:minmax(380px,1fr) 474px; gap:50px; align-items:start; }
+    .notes h2 { margin:3px 0 8px; font-size:28px; }
+    .notes > p { margin:0 0 25px; color:var(--muted); }
+    .note { margin-bottom:14px; padding:18px 20px; border:1px solid var(--line); background:var(--surface); }
+    .note h3 { margin:0 0 10px; font-size:16px; }
+    .note ul { margin:0; padding-left:19px; }
+    .note li + li { margin-top:7px; }
+    .preview { position:sticky; top:25px; width:min(452px, 100%); padding:10px; border:1px solid #90979e; border-radius:23px; background:#f7f8f9; }
+    iframe { display:block; width:100%; max-width:430px; height:900px; border:0; background:#f6f7f8; }
+    @media (max-width:920px) { .layout { grid-template-columns:1fr; padding:20px 18px; } .preview { position:relative; top:auto; margin:auto; max-width:100%; } }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <section class="notes">
+      <h2 id="page-title"></h2>
+      <p id="page-purpose"></p>
+      <article class="note"><h3>页面展示</h3><ul id="display-list"></ul></article>
+      <article class="note"><h3>字段</h3><ul id="field-list"></ul></article>
+      <article class="note"><h3>规则</h3><ul id="rule-list"></ul></article>
+    </section>
+    <section class="preview" aria-label="原型预览"><iframe id="prototype" title="个人中心原型"></iframe></section>
+  </main>
+  <script>
+    const source = '个人中心_开通后_线框原型.html';
+    const content = {
+      profile: {
+        title: '个人中心', purpose: '完整展示个人中心现有内容；本说明只覆盖身份信息和“我的服务”区域。',
+        display: ['姓名旁展示用户已拥有的身份标签。', '“我的服务”提供业务中心、教学中心、学习中心入口。', '学习中心有即将上课课程时显示红色数字提醒。'],
+        fields: ['身份标签：合伙人、老师、家长。', '服务入口名称。', '未来课程提醒数量。'],
+        rules: ['用户可拥有一种或多种身份。', '只显示用户已拥有身份对应的服务入口。', '其他个人中心内容维持原有展示，不在此说明中展开。']
+      },
+      partner: {
+        title: '业务中心', purpose: '面向合伙人的课时管理与推广工作台。',
+        display: ['一级展示课时池，直接提供分配课时操作。', '下方展示会员销售、课程销售两个推广工具。'],
+        fields: ['已购课时、已分配、可分配课时。', '会员销售、课程销售。'],
+        rules: ['课时分配为一级主操作。', '会员销售转发会员推广页，由他人自主购买。', '课程销售筛选课程后单独转发。']
+      },
+      teacher: {
+        title: '教学中心', purpose: '面向老师的教学安排与任务工作台。',
+        display: ['教学数据展示累计授课和本月排课。', '一级直接展示月度排课日历与部分已排课程。', '课后提交、布置作业作为紧凑教学任务入口。'],
+        fields: ['累计授课课时、本月排课数。', '课程时间、学生、上课地点。', '待提交课程反馈数。'],
+        rules: ['上课记录由系统自动同步。', '已排课程默认展示部分记录，可展开全部。', '教学任务进入对应表单完成处理。']
+      },
+      parent: {
+        title: '学习中心', purpose: '面向家长和学生的学习数据与学习日程工作台。',
+        display: ['学习数据展示上课记录和剩余课时。', '一级直接展示按孩子安排的月度课程计划。', '下方展示即将上课、学生档案和课签确认。'],
+        fields: ['上课记录、剩余课时。', '孩子、课程、时间、老师。', '学生档案、课签确认。'],
+        rules: ['课程计划以孩子学习日程为中心，不强调老师空闲时间。', '存在未来课程时，个人中心学习中心显示红色角标。', '学习数据卡可进入对应详情查看。']
+      },
+      'partner-课时分配': {
+        title: '课时分配', purpose: '将合伙人已购的课时分配给指定用户。',
+        display: ['展示课时汇总和已分配用户。', '通过“分配课时”选择用户并填写分配数量。'],
+        fields: ['已购课时、已分配、可分配课时。', '用户姓名、当前已分配课时、此次分配课时。'],
+        rules: ['分配数量不可超过可分配课时。', '完成分配后更新课时汇总和用户的已分配数量。']
+      },
+      'partner-会员销售': {
+        title: '会员销售', purpose: '选择会员推广页并转发给其他用户购买。',
+        display: ['展示普通会员和卓越会员两种推广页。', '每种会员提供独立转发操作。'],
+        fields: ['会员名称、会员价格、转发入口。'],
+        rules: ['仅转发推广页，不在当前页面直接开通会员。', '购买由收到推广页的用户自行完成。']
+      },
+      'partner-课程销售': {
+        title: '课程销售', purpose: '浏览平台课程，筛选后转发单门课程。',
+        display: ['列表展示平台课程及课程简介。', '支持按学段、学科、课程类型和授课方式筛选。'],
+        fields: ['课程名称、学段、学科、类型、授课方式、价格、简介。'],
+        rules: ['一次选择并转发一门课程。', '转发后由接收方自主购买课程。']
+      },
+      'teacher-上课记录': {
+        title: '上课记录', purpose: '查看老师全部已完成课程的授课明细。',
+        display: ['顶部展示累计授课课时。', '下方按时间展示全部课程记录，不提供手动新增。'],
+        fields: ['课程名称、上课学生、上课时间、上课地点、课时数。'],
+        rules: ['记录由课程完成情况自动同步。', '每条记录完整呈现本次上课信息。']
+      },
+      'teacher-排课动态': {
+        title: '排课动态', purpose: '查看老师的课程工作安排。',
+        display: ['按月展示日历，可切换过去和未来月份。', '日历下方列出已排课程与空闲日期提示。'],
+        fields: ['日期、时间、课程、学生、上课地点、课时数。'],
+        rules: ['日历体现老师已排课程与空闲日期。', '列表按日期呈现该月课程安排。']
+      },
+      'teacher-课后提交': {
+        title: '课后提交', purpose: '对已完成课程提交教学反馈。',
+        display: ['展示待提交、本月已提交、累计评价和好评率。', '选择一节课程后填写评分与评价。'],
+        fields: ['课程、学生、上课时间、评分、评价内容。'],
+        rules: ['仅可选择已完成且待提交的课程。', '评分和评价提交后可由家长在课程记录中查看。']
+      },
+      'teacher-布置作业': {
+        title: '布置作业', purpose: '基于已上课程向学生发布课后作业。',
+        display: ['课程和学生均使用下拉多选。', '学生默认全选，课程默认不选择。'],
+        fields: ['课程、学生、作业内容。'],
+        rules: ['可同时选择多节课程和多名学生。', '不包含批改功能。']
+      },
+      'parent-学生档案': {
+        title: '学生档案', purpose: '维护一个或多个孩子的基本学习信息。',
+        display: ['以紧凑卡片展示每个孩子的信息。', '支持添加孩子；编辑入口位于卡片右侧。'],
+        fields: ['孩子头像、孩子姓名、性别、年级、就读学校。'],
+        rules: ['一个家长可添加多个孩子。', '添加和修改均需完整填写基本信息。']
+      },
+      'parent-课程计划': {
+        title: '课程计划', purpose: '从家长视角查看孩子的学习日程。',
+        display: ['月历在日期内标示孩子姓名、课程与时间。', '列表中即将上课在上方，已完成课程在下方。'],
+        fields: ['孩子、课程、日期、时间、老师、上课地点、状态。'],
+        rules: ['课程计划体现孩子的日程，不展示老师空闲时间。', '存在未来课程时，学习中心入口显示红色数字提醒。']
+      },
+      'parent-课签确认': {
+        title: '课签确认', purpose: '确认已完成课程的上课签到。',
+        display: ['从已完成课程中选择需要确认的一节课。', '展示课程、孩子、完整日期、地点和老师。'],
+        fields: ['课程、孩子、上课时间、上课地点、老师。'],
+        rules: ['仅可对已完成课程进行课签确认。', '确认后该次课程显示已签到状态。']
+      },
+      'parent-上课记录': {
+        title: '上课记录', purpose: '查看孩子已经完成的全部课程。',
+        display: ['支持按课程关键词、孩子、授课方式和老师筛选。', '列表展示符合条件的课程记录。'],
+        fields: ['课程、孩子、老师、授课方式、时间、地点、课时数。'],
+        rules: ['仅展示已完成课程。', '多项筛选条件同时生效。']
+      },
+      'parent-剩余课时': {
+        title: '剩余课时', purpose: '查看每个孩子和课程当前可使用的课时，并进入续费。',
+        display: ['按课程列出孩子的剩余课时。', '底部提供课时续费入口。'],
+        fields: ['课程名称、孩子、剩余课时。'],
+        rules: ['不展示备注或课时明细。', '续费进入后续购买流程。']
+      }
+    };
+    const frame = document.querySelector('#prototype');
+    let activeRole = '';
+    let activePage = '';
+    function fill(id, values) { document.querySelector(id).innerHTML = values.map(value => '<li>' + value + '</li>').join(''); }
+    function setNote(page) {
+      const item = content[page];
+      if (!item) return;
+      if (activePage === page) return;
+      activePage = page;
+      document.querySelector('#page-title').textContent = item.title;
+      document.querySelector('#page-purpose').textContent = item.purpose;
+      fill('#display-list', item.display); fill('#field-list', item.fields); fill('#rule-list', item.rules);
+    }
+    window.addEventListener('message', event => {
+      const message = event.data;
+      if (!message || message.channel !== 'personal-center-prototype') return;
+      setNote(message.page);
+    });
+    setNote('profile');
+    frame.src = source;
+  </script>
+</body>
+</html>
