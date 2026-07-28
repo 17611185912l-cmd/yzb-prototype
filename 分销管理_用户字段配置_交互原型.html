@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>优坐标管理系统 - 用户团队</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-plus@2.13.3/dist/index.css" />
+  <style>
+    :root { --brand: #1677ff; --ink: #1f2937; --muted: #7a8494; --line: #e5e7eb; --canvas: #f5f7fa; }
+    * { box-sizing: border-box; }
+    html, body, #app { min-width: 1180px; min-height: 100%; margin: 0; }
+    body { color: var(--ink); background: var(--canvas); font: 13px -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .layout { min-height: 100vh; display: grid; grid-template-columns: 176px minmax(0, 1fr); grid-template-rows: 68px 1fr; }
+    .topbar { grid-column: 1 / -1; display: flex; align-items: center; height: 68px; background: #fff; border-bottom: 1px solid var(--line); }
+    .brand { width: 176px; height: 68px; display: flex; align-items: center; gap: 10px; padding-left: 16px; border-right: 1px solid var(--line); font-size: 16px; font-weight: 700; white-space: nowrap; }
+    .brand-mark { position: relative; width: 22px; height: 22px; transform: skewX(-20deg); border-radius: 4px; background: linear-gradient(135deg, #725df0 0 45%, #34c9ef 46% 100%); }
+    .top-main { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .crumb { color: #677182; font-size: 13px; } .crumb b { color: #344054; font-weight: 500; }
+    .top-tools { display: flex; align-items: center; gap: 15px; color: #737d8e; }
+    .search-pill { width: 164px; height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 10px; color: #a0a8b5; background: #f7f8fa; border-radius: 15px; font-size: 12px; }
+    .avatar { display: grid; place-items: center; width: 29px; height: 29px; color: white; border: 2px solid white; border-radius: 50%; background: #24354e; font-size: 11px; }
+    .side { grid-row: 2; overflow: hidden; background: #fff; border-right: 1px solid var(--line); }
+    .side-group { margin-top: 6px; } .nav-item { display: flex; align-items: center; justify-content: space-between; height: 36px; margin: 0 4px; padding: 0 12px; color: #303846; border-radius: 5px; cursor: pointer; }
+    .nav-item .nav-icon { width: 18px; color: #687486; } .nav-item .nav-name { flex: 1; } .nav-item:hover { color: var(--brand); background: #f4f8ff; }
+    .nav-item.active { color: var(--brand); background: #e8f1ff; font-weight: 600; } .nav-child { margin-left: 12px; }
+    .main { min-width: 0; padding: 14px 14px 24px; }
+    .tabbar { display: flex; align-items: end; height: 42px; padding: 0 14px; background: #fff; border-bottom: 1px solid var(--line); }
+    .page-tab { height: 42px; display: flex; align-items: center; padding: 0 13px; color: #5d6776; border-bottom: 2px solid transparent; cursor: pointer; }
+    .page-tab.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+    .content { padding: 14px; background: #fff; min-height: calc(100vh - 110px); }
+    .filter-form { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 16px; padding: 8px 0 18px; }
+    .filter-form .el-form-item { margin: 0; }.filter-form .el-input { width: 190px; }.filter-form .el-select { width: 165px; }.filter-form .el-cascader { width: 180px; }.filter-form .date-range { width: 250px; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 1px solid #eff1f4; }
+    .toolbar-note { color: #8a94a4; font-size: 12px; }.toolbar .el-button + .el-button { margin-left: 8px; }
+    .data-table { width: 100%; }.data-table .el-table__cell { padding: 9px 0; }.data-table .cell { white-space: nowrap; }
+    .account-cell b { display: block; color: #303946; font-weight: 500; }.account-cell span { display: block; margin-top: 2px; color: #8b95a5; font-size: 12px; }
+    .team-count { color: #4c5666; }.row-actions .el-button { margin: 0 0 0 8px; }
+    .page-foot { display: flex; justify-content: flex-end; padding-top: 16px; }
+    .operation-link { color: var(--brand); cursor: pointer; }.operation-danger { color: #f56c6c; cursor: pointer; }.mute { color: #a0a8b4; }
+    .empty-cell { color: #a4adba; }.header-note { display: flex; align-items: center; gap: 5px; color: #8b95a5; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/element-plus@2.13.3/dist/index.full.min.js"></script>
+  <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+  <script>
+    const { createApp, ref, reactive, computed } = Vue;
+        const { ElMessage } = ElementPlus;
+    const App = {
+      setup() {
+        const query = reactive({ keyword: '', permission: '', role: '', referrer: '', region: [], applyDate: [] });
+        const loading = ref(false), currentPage = ref(1), pageSize = ref(10);
+        const rows = ref([
+          { id: 1, account: '用户489298', role: '家长', login: '183****2832', team: '一星 0 / 二星 0', permission: '未申请', referrer: '张琴琴', referrerPhone: '186****7821', region: '陕西省 / 西安市', regionValue: ['shanxi', 'xian'], applyDate: '2026-07-27 10:23:18' },
+          { id: 2, account: '用户160290', role: '家长', login: '176****5912', team: '一星 0 / 二星 0', permission: '待审核', referrer: '李老师', referrerPhone: '138****4619', region: '陕西省 / 西安市', regionValue: ['shanxi', 'xian'], applyDate: '2026-07-26 16:08:42' },
+          { id: 3, account: 'Jkkd', role: '教师', login: '189****9926', team: '一星 0 / 二星 0', permission: '已开通', referrer: '王教员', referrerPhone: '159****0792', region: '北京市 / 北京市', regionValue: ['beijing', 'beijing-city'], applyDate: '2026-07-24 09:12:06' },
+          { id: 4, account: '用户668219', role: '家长', login: '156****1051', team: '一星 0 / 二星 0', permission: '未申请', referrer: '-', referrerPhone: '-', region: '河南省 / 郑州市', regionValue: ['henan', 'zhengzhou'], applyDate: '2026-07-23 14:38:55' },
+          { id: 5, account: '用户990030', role: '家长', login: '178****5021', team: '一星 0 / 二星 0', permission: '未申请', referrer: '张琴琴', referrerPhone: '186****7821', region: '河南省 / 郑州市', regionValue: ['henan', 'zhengzhou'], applyDate: '2026-07-21 11:26:31' },
+          { id: 6, account: '用户038374', role: '家长', login: '187****9696', team: '一星 0 / 二星 0', permission: '已关闭', referrer: '赵老师', referrerPhone: '133****1138', region: '四川省 / 成都市', regionValue: ['sichuan', 'chengdu'], applyDate: '2026-07-20 18:05:17' },
+          { id: 7, account: '少儿', role: '家长', login: '195****4164', team: '一星 0 / 二星 0', permission: '未申请', referrer: '-', referrerPhone: '-', region: '北京市 / 北京市', regionValue: ['beijing', 'beijing-city'], applyDate: '2026-07-19 08:49:20' },
+          { id: 8, account: '小陈', role: '教师', login: '187****2413', team: '一星 1 / 二星 0', permission: '已开通', referrer: '李老师', referrerPhone: '138****4619', region: '四川省 / 成都市', regionValue: ['sichuan', 'chengdu'], applyDate: '2026-07-18 15:32:48' },
+          { id: 9, account: '用户295160', role: '家长', login: '156****3913', team: '一星 0 / 二星 0', permission: '待审核', referrer: '王教员', referrerPhone: '159****0792', region: '陕西省 / 西安市', regionValue: ['shanxi', 'xian'], applyDate: '2026-07-16 12:17:43' },
+          { id: 10, account: '邵老师', role: '教师', login: '134****9770', team: '一星 1 / 二星 0', permission: '已开通', referrer: '张琴琴', referrerPhone: '186****7821', region: '河南省 / 郑州市', regionValue: ['henan', 'zhengzhou'], applyDate: '2026-07-15 09:51:02' }
+        ]);
+        const regionOptions = [
+          { value: 'shanxi', label: '陕西省', children: [{ value: 'xian', label: '西安市' }] },
+          { value: 'beijing', label: '北京市', children: [{ value: 'beijing-city', label: '北京市' }] },
+          { value: 'henan', label: '河南省', children: [{ value: 'zhengzhou', label: '郑州市' }] },
+          { value: 'sichuan', label: '四川省', children: [{ value: 'chengdu', label: '成都市' }] }
+        ];
+        const filteredRows = computed(() => rows.value.filter(row => {
+          const keyword = query.keyword.trim().toLowerCase();
+          const referrer = query.referrer.trim().toLowerCase();
+          const withinDate = !query.applyDate || query.applyDate.length !== 2 || (row.applyDate.slice(0, 10) >= query.applyDate[0] && row.applyDate.slice(0, 10) <= query.applyDate[1]);
+          const inRegion = !query.region || !query.region.length || query.region.every((value, index) => row.regionValue[index] === value);
+          return (!keyword || row.account.toLowerCase().includes(keyword) || row.login.includes(keyword)) && (!query.permission || row.permission === query.permission) && (!query.role || row.role === query.role) && (!referrer || row.referrer.toLowerCase().includes(referrer) || row.referrerPhone.includes(referrer)) && inRegion && withinDate;
+        }));
+        const pagedRows = computed(() => filteredRows.value.slice((currentPage.value - 1) * pageSize.value, currentPage.value * pageSize.value));
+        function resetQuery() { query.keyword = ''; query.permission = ''; query.role = ''; query.referrer = ''; query.region = []; query.applyDate = []; currentPage.value = 1; }
+        function search() { loading.value = true; currentPage.value = 1; setTimeout(() => { loading.value = false; }, 350); }
+        function permissionType(status) { return status === '已开通' ? 'success' : status === '待审核' ? 'warning' : status === '已关闭' ? 'info' : ''; }
+        function audit(row) { row.permission = '已开通'; ElMessage.success(`已为 ${row.account} 开通权限`); }
+        const Icons = ElementPlusIconsVue;
+        return { Icons, query, loading, currentPage, pageSize, regionOptions, filteredRows, pagedRows, resetQuery, search, permissionType, audit };
+      },
+      template: `
+        <div class="layout">
+          <header class="topbar"><div class="brand"><i class="brand-mark"></i><span>优坐标管理系统</span></div><div class="top-main"><div class="crumb">☰　　⟳　　<b>✳ 分销管理</b>　›　用户团队</div><div class="top-tools"><div class="search-pill">⌕　搜索　⌘ K</div><span>◐</span><span>⛶</span><span>♧</span><i class="avatar">管</i></div></div></header>
+          <aside class="side"><div class="side-group"><div class="nav-item"><span class="nav-icon">✳</span><span class="nav-name">分销管理</span><span style="color:#1677ff">⌃</span></div><div class="nav-child"><div class="nav-item active"><span class="nav-icon">♟</span><span class="nav-name">用户团队</span></div></div></div></aside>
+          <main class="main"><div class="tabbar"><span class="page-tab active">✳ 用户团队　×</span><span class="page-tab">▤ 课程管理　×</span><span class="page-tab">♙ 招募老师列表　×</span><span class="page-tab">▤ 渠道商管理　×</span><span class="page-tab">♟ 会员管理　×</span></div><section class="content">
+            <el-tabs model-value="users"><el-tab-pane label="用户列表" name="users"><template #label><span>用户列表</span></template></el-tab-pane><el-tab-pane label="团队列表" name="teams"></el-tab-pane></el-tabs>
+            <el-form :model="query" inline class="filter-form" @submit.prevent="search"><el-form-item label="关键词"><el-input v-model="query.keyword" clearable placeholder="用户姓名/手机号" @keyup.enter="search" /></el-form-item><el-form-item label="推荐人"><el-input v-model="query.referrer" clearable placeholder="姓名/手机号" @keyup.enter="search" /></el-form-item><el-form-item label="地区"><el-cascader v-model="query.region" :options="regionOptions" clearable filterable placeholder="请选择省市" /></el-form-item><el-form-item label="申请时间"><el-date-picker v-model="query.applyDate" class="date-range" type="daterange" value-format="YYYY-MM-DD" start-placeholder="开始日期" end-placeholder="结束日期" range-separator="至" /></el-form-item><el-form-item label="权限状态"><el-select v-model="query.permission" clearable placeholder="全部"><el-option label="未申请" value="未申请"/><el-option label="待审核" value="待审核"/><el-option label="已开通" value="已开通"/><el-option label="已关闭" value="已关闭"/></el-select></el-form-item><el-form-item label="身份"><el-select v-model="query.role" clearable placeholder="全部"><el-option label="家长" value="家长"/><el-option label="教师" value="教师"/></el-select></el-form-item><el-form-item><el-button type="primary" @click="search">查询</el-button><el-button @click="resetQuery">重置</el-button></el-form-item></el-form>
+            <div class="toolbar"><div class="toolbar-note">共 {{ filteredRows.length }} 条用户记录</div><div><el-button :icon="Icons.Refresh" @click="search">刷新</el-button></div></div>
+            <el-table :data="pagedRows" row-key="id" border stripe v-loading="loading" class="data-table" empty-text="暂无符合条件的用户"><el-table-column type="index" width="54" label="序号"/><el-table-column label="用户" min-width="130"><template #default="{ row }"><div class="account-cell"><b>{{ row.account }}</b></div></template></el-table-column><el-table-column prop="role" label="身份" width="78"/><el-table-column prop="login" label="登录账号" min-width="130"/><el-table-column prop="referrer" label="推荐人" min-width="105"/><el-table-column prop="referrerPhone" label="推荐人手机" min-width="130"/><el-table-column prop="region" label="地区（省市）" min-width="150"/><el-table-column prop="applyDate" label="申请时间" min-width="165"/><el-table-column prop="team" label="团队" min-width="135"/><el-table-column label="权限状态" width="100"><template #default="{ row }"><el-tag size="small" :type="permissionType(row.permission)" effect="light">{{ row.permission }}</el-tag></template></el-table-column><el-table-column label="操作" fixed="right" width="190"><template #default="{ row }"><div class="row-actions"><el-button v-if="row.permission === '待审核'" type="primary" size="small" @click="audit(row)">审核开通</el-button><el-button v-if="row.permission === '待审核'" type="danger" plain size="small">拒绝</el-button><el-button v-if="row.permission === '已开通'" type="danger" size="small">关闭权限</el-button><span v-if="row.permission === '未申请' || row.permission === '已关闭'" class="mute">-</span></div></template></el-table-column></el-table>
+            <div class="page-foot"><el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 50]" layout="total, sizes, prev, pager, next, jumper" :total="filteredRows.length" /></div>
+          </section></main>
+        </div>
+      `
+    };
+    const app = createApp(App); app.use(ElementPlus); app.mount('#app');
+  </script>
+</body>
+</html>
